@@ -1,0 +1,63 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    
+<div class="row align-items-start">
+    <div class="col">
+       {% for post in posts%}
+         <!---->
+         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-1 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+              
+              <a href="{% url 'profile' post.user  %}"><img src="https://i.pinimg.com/736x/83/bc/8b/83bc8b88cf6bc4b4e04d153a418cde62.jpg" alt="mdo" width="40" height="40" class="rounded-circle" style="margin-right: 10px;"><strong class="d-inline-block mb-2 text-primary"> {{ post.user|title }}</strong></a>
+              
+              
+              <span class="d-inline mb-1">
+                <h5 class="d-inline-block text-black mb-0">{{ post.title }}</h5> 
+                <h5 class="d-inline-block text-muted" style="margin-left: 5px;">| {{ post.time }}</h5>
+              </span>
+              
+              <span class="text-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"></path>
+                </svg>
+                <strong id="{{ post.id }}">{{ post.like.all.count}}</strong>
+              </span>
+
+              <p class="card-text mb-auto">{{ post.body }}</p>
+              <br>
+              {% if user in post.like.all%}
+              <button class="w-25 btn btn-outline-secondary" id="buttonlike{{ post.id }}"  onclick="like('{{ post.id }}');">Unlike</button>
+              {% else %}
+              <button class="w-25 btn btn-outline-danger" id="buttonlike{{ post.id }}" onclick="like('{{ post.id }}');">Like</button>
+              {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <nav aria-label="Page navigation" style="margin-top: 30px;">
+          <ul class="pagination justify-content-center">
+            {% if posts.has_previous and posts.number != 1 %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ posts.previous_page_number }}">{{ posts.previous_page_number }}</a>
+                </li>
+            {% endif %}
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="?page={{ posts.number }}">{{ posts.number }} <span class="sr-only">(current)</span></a>
+            </li>
+            {% if posts.has_next and posts.number != posts.paginator.num_pages %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ posts.next_page_number }}">{{ posts.next_page_number }}</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ posts.next_page_number }}">Next</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+        <script src="{% static 'network/layout.js' %}"></script>
+{% endblock %}

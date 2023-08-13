@@ -1,0 +1,120 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+   
+
+<div class="row align-items-start">
+    <div class="col">
+        <!---->
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-1 shadow-sm h-md-250 position-relative">
+            <div class="col-6 p-3 ">
+                
+                <img src="https://i.pinimg.com/736x/83/bc/8b/83bc8b88cf6bc4b4e04d153a418cde62.jpg"  alt="mdo" width="70" height="70" class="rounded-circle inline-block">
+                <strong class="d-inline h3 text-primary" style="margin-left: 5px;">{{ profile.username|title }}</strong>
+                <p class="text-muted" style="margin-top: 10px;">{% lorem 10 w %}</p>
+                
+                {% if user.is_authenticated %}
+                    {% if profile.follow %}
+                    <button class="w-25 btn btn-outline-primary" onclick="follow();" data-user="{{ profile.username.id }}" id="follow" style="padding: 5px;">{{ profile.bfollow }}</button>       
+                    {% endif %}                    
+                {% endif %}
+                    
+            </div>
+            <div class="col-6 p-4 d-flex flex-column position-static">
+            <table class="table table-borderless text-center">
+                <thead>
+                <tr>
+                    <th scope="col">Post</th>
+                    <th scope="col">Follower</th>
+                    <th scope="col">Following</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ profile.npost }}</td>
+                    <td id="nfollower">{{ profile.nfollower }}</td>
+                    <td>{{ profile.nfollowing }}</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+       
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-1 shadow-lg h-md-250 position-relative" style="display: none;" id="editpost">
+          <div class="col p-4 d-flex flex-column position-static">
+            <form id="compose-form">
+                <h3>Edit Post</h3>
+                <input type="hidden" name="id" id="post-id">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="post-title"></input>
+                </div>
+                <div class="form-group">
+                  <textarea class="form-control" id="post-body"></textarea>
+                </div>
+                  <button class="btn btn-primary" type="submit" onclick="editPost();">Edit Post!</button>
+            </form>
+            </div>
+          </div>
+         
+         <!---->
+         {% for post in posts%}
+          <!---->
+          <div class="row g-0 border rounded overflow-hidden flex-md-row mb-1 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+              
+              <a href="{% url 'profile' post.user  %}"><img src="https://i.pinimg.com/736x/83/bc/8b/83bc8b88cf6bc4b4e04d153a418cde62.jpg" alt="mdo" width="40" height="40" class="rounded-circle" style="margin-right: 10px;"><strong class="d-inline-block mb-2 text-primary"> {{ post.user|title }}</strong></a>
+              
+              
+              <span class="d-inline mb-1">
+                <h5 class="d-inline-block text-black mb-0">{{ post.title }}</h5> 
+                <h5 class="d-inline-block text-muted" style="margin-left: 5px;">| {{ post.time }}</h5>
+              </span>
+              
+              <span class="text-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"></path>
+                </svg>
+                <strong id="{{ post.id }}">{{ post.like.all.count}}</strong>
+              </span>
+
+              <p class="card-text mb-auto">{{ post.body }}</p>
+              <br>
+              {% if profile.follow == False %}
+                    <button class="w-25 btn btn-primary" data-user="{{ user.id  }}" data-post="{{ post.id }}" id="edit" onclick="editForm('{{ post.id }}');" style="padding: 5px;">Edit</button>
+              {% else %}
+                {% if user in post.like.all%}
+                <button class="w-25 btn btn-outline-secondary" id="buttonlike{{ post.id }}"  onclick="like('{{ post.id }}');">Unlike</button>
+                {% else %}
+                <button class="w-25 btn btn-outline-danger" id="buttonlike{{ post.id }}" onclick="like('{{ post.id }}');">Like</button>
+                {% endif %}
+              {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        
+        <nav aria-label="Page navigation" style="margin-top: 30px;">
+            <ul class="pagination justify-content-center">
+              {% if posts.has_previous and posts.number != 1 %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.previous_page_number }}">{{ posts.previous_page_number }}</a>
+                  </li>
+              {% endif %}
+              <li class="page-item active" aria-current="page">
+                <a class="page-link" href="?page={{ posts.number }}">{{ posts.number }} <span class="sr-only">(current)</span></a>
+              </li>
+              {% if posts.has_next and posts.number != posts.paginator.num_pages %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ posts.next_page_number }}">{{ posts.next_page_number }}</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ posts.next_page_number }}">Next</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+      
+{% endblock %}
